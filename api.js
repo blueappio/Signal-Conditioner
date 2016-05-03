@@ -116,7 +116,7 @@
                     return;
                 }
                 if (characteristic.uuid === CURRENT_UUID) {
-                    api.currentValue = parseFloat(api.cScale(api.calcApiReading(characteristic.value))) * 0.01;
+                    api.currentValue = api.calcApiReading(characteristic.value) * 0.01;
                     api.currentValue = api.currentValue.toFixed(2);
                 }
                 if (characteristic.uuid === RELAY_UUID) {
