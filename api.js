@@ -11,19 +11,12 @@
 
     class API {
         constructor() {
-            this.cScale='';
             this.isOn = false;
-            this.minUnit = 4;
-            this.maxUnit = 20;
             this.apiUnit = 'mA';
             this.currentValue = 0;
             this.shuntVoltage = 0;
             this.busVoltage = 0;
             this.characteristics = {};
-
-            if (this.cScale === '' ){
-              this.cScale = d3.scale.linear().range([this.minUnit,this.maxUnit]).domain([3,20]);
-            }
 
             gateway = navigator.bluetooth.gateway;
 
@@ -128,11 +121,11 @@
                     }
                 }
                 if (characteristic.uuid === SHUNT_VOLT_UUID) {
-                    api.shuntVoltage = parseFloat(api.calcApiReading(characteristic.value)) * 0.01;
+                    api.shuntVoltage = api.calcApiReading(characteristic.value) * 0.01;
                     api.shuntVoltage = api.shuntVoltage.toFixed(2);
                 }
                 if (characteristic.uuid === BUS_VOLT_UUID) {
-                    api.busVoltage = parseFloat(api.calcApiReading(characteristic.value)) * 0.01;
+                    api.busVoltage = api.calcApiReading(characteristic.value) * 0.01;
                     api.busVoltage = api.busVoltage.toFixed(2);
                 }
                 api.updateUI();
