@@ -1,53 +1,59 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>API</title>
-        <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/angular-material/0.9.7/angular-material.min.css'>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-animate.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular-aria.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/angular-material/0.8.2/angular-material.min.js'></script>
-    <script src="https://blueappio.github.io/blueapp.io/blueapp.io.min.js"></script>
-    <script src="blucurrent.js"></script>
-    <script src="app.js"></script>
 
-    <body ng-app="api" class="thing">
-        <div ng-controller="mainController as main" md-theme-watch="true">
-            <div class="pt-8 pb-32 ng-scope layout-align-center-center layout-column" layout="column" layout-align="center center">
-                <div class="light-blue-fg font-size-72 line-height-72 padding-top-9 ng-binding">
-                    {{api.currentValue}} <sub style="font-size: 30px;"> {{api.apiUnit}} </sub>
-                </div>
-                <div class="h3 secondary-text font-weight-500 padding-top-9 ng-binding">
-                    <md-list>
-                        <md-list-item>
-                            <p> Relay : </p>
-                            <md-switch ng-model="api.isOn" aria-label="Switch 1" ng-change="toggleRelay()">
-                            </md-switch>
-                        </md-list-item>
-                    </md-list>
-                </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BluCrrent</title>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc4/angular-material.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc4/angular-material.min.js"></script>
+
+<script src="https://vensi.github.io/blueapp.io/latest/blueapp.io.min.js"></script>
+<script src="blucurrent.js"></script>
+<script src="app.js"></script>
+
+<body ng-app="blucurrent" class="thing">
+    <div ng-controller="mainController as main" md-theme-watch="true">
+        <div class="pt-8 pb-32 ng-scope layout-align-center-center layout-column" layout="column" layout-align="center center" ng-hide="!blucurrent.connected">
+            <div class="light-blue-fg font-size-72 line-height-72 padding-top-9 ng-binding">
+                {{currentValue}} <sub style="font-size: 30px;"> mA </sub>
             </div>
-            <div class="layout-wrap layout-row flex-100" layout="row" flex="100" layout-wrap="">
-                <div layout="column" flex="100" flex-gt-sm="50" class="layout-column flex-gt-sm-50 flex-100">
+            <div class="h3 secondary-text font-weight-500 padding-top-9 ng-binding">
+                <md-list>
                     <md-list-item>
-                        <p style="padding-left: 10px;"> Shunt Voltage : </p>
-                        <p class="reading-display">{{api.shuntVoltage}}</p>
+                        <p> Relay : </p>&nbsp
+                        <md-switch ng-model="isOn" aria-label="Switch 1" ng-change="toggleRelay()" style="padding-top: 3px;">
+                        </md-switch>
                     </md-list-item>
-                </div>
-
-                <div layout="column" flex="100" flex-gt-sm="50" class="layout-column flex-gt-sm-50 flex-100">
-                    <md-list-item>
-                        <p style="padding-left: 10px;">BUS Voltage :</p>
-                        <p class="reading-display">{{api.busVoltage}}</p>
-                    </md-list-item>
-                </div>
+                </md-list>
             </div>
         </div>
-    </body>
+        <div class="layout-wrap layout-row flex-100" layout="row" flex="100" layout-wrap="">
+            <div layout="column" flex="100" flex-gt-sm="50" class="layout-column flex-gt-sm-50 flex-100">
+                <md-list-item>
+                    <p style="padding-left: 10px;"> Shunt Voltage : </p>
+                    <p class="reading-display">{{shuntVoltage}}</p>
+                </md-list-item>
+            </div>
+            <div layout="column" flex="100" flex-gt-sm="50" class="layout-column flex-gt-sm-50 flex-100">
+                <md-list-item>
+                    <p style="padding-left: 10px;">BUS Voltage :</p>
+                    <p class="reading-display">{{busVoltage}}</p>
+                </md-list-item>
+            </div>
+        </div>
+        <div layout="row" layout-align="start start" ng-hide="blucurrent.connected">
+            <md-button class="md-raised connect-btn" ng-click="onConnect()" style="top: 20px;background-color: #dc6767 !important;color: #ffffff !important;">
+                Connect
+            </md-button>
+        </div>
+    </div>
+</body>
 
 </html>

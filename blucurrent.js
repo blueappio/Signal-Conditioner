@@ -1,149 +1,103 @@
-(function() {
+"use strict";
 
-    var gattip = null;
+var BluCurrent = function () {
 
-    const SERVICE_UUID = "1234";
+    var SERVICE_UUID = 0x1234;
 
-    const SHUNT_VOLT_UUID = "1236";
-    const BUS_VOLT_UUID = "1237";
-    const CURRENT_UUID = "1239";
-    const RELAY_UUID = "123B";
+    var SHUNT_VOLT_UUID = 0x1236;
+    var BUS_VOLT_UUID = 0x1237;
+    var CURRENT_UUID = 0x1239;
+    var RELAY_UUID = 0x123B;
 
-    class API {
-        constructor() {
-            this.isOn = false;
-            this.apiUnit = 'mA';
-            this.currentValue = 0;
-            this.shuntVoltage = 0;
-            this.busVoltage = 0;
-            this.peripheral = {};
-
-            gattip = navigator.bluetooth.gattip;
-
-            gattip.once('ready', function(gateway) {
-                function onScan(peripheral) {
-                    api.peripheral = peripheral;
-                    console.log('Found peripheral', peripheral.name);
-                    gateway.removeListener('scan', onScan);
-                    gateway.stopScan(function() {
-                        peripheral.connect(function() {
-                            api.readCharacteristicValues(peripheral);
-                            api.onSuccess('Connected with ' + peripheral.name);
-                        });
-                    });
-                }
-                gateway.scan();
-                gateway.on('scan', onScan);
-            });
-
-            gattip.on('error', function(err) {
-                console.log(err);
-            });
-        }
-
-        /* ------- API Handling Functions ------- */
-
-        readCharacteristicValues(peripheral) {
-            api.getRelayStatus();
-            api.enableNotifyCurrentChar();
-            api.enableNotifyBusChar();
-            api.enableNotifyShuntChar();
-        };
-
-        getCharacteristic(serv, characteristic) {
-            var service = api.peripheral.findService(serv);
-            if (service) {
-                var char = service.findCharacteristic(characteristic);
-                return char;
-            }
-        };
-
-        toggleRelay(status) {
-            if (status) {
-                api.relayON();
-            } else {
-                api.relayOFF();
-            }
-        };
-
-        relayON() {
-            var char = api.getCharacteristic(SERVICE_UUID, RELAY_UUID);
-            char.writeValue(function(char) {}, '00');
-        };
-
-        relayOFF() {
-            var char = api.getCharacteristic(SERVICE_UUID, RELAY_UUID);
-            char.writeValue(function(char) {}, '01');
-        };
-
-        getRelayStatus() {
-            var char = api.getCharacteristic(SERVICE_UUID, RELAY_UUID);
-            char.readValue(function(char, value) {
-                if (value === '00') { //ON
-                    api.isOn = true;
-                } else { //OFF
-                    api.isOn = false;
-                }
-            });
-        };
-
-        enableNotifyCurrentChar() {
-            var value = '';
-            var notify_char = api.getCharacteristic(SERVICE_UUID, CURRENT_UUID);
-            if (notify_char) {
-                notify_char.on('valueChange', function(notify_char) {
-                    api.currentValue = api.calcApiReading(notify_char.value) * 0.01;
-                    api.currentValue = api.currentValue.toFixed(2);
-                    var d = new Date();
-                    var currDate = d.getHours()+':'+d.getMinutes()+':'+d.getSeconds();
-                    console.log('Current notified at : ', currDate);
-                    api.updateUI();
-                }, value);
-                notify_char.enableNotifications(function(notify_char, value) {
-                    console.log('Enabled the notification ', value);
-                }, true);
-            }
-        };
-
-        enableNotifyBusChar() {
-            var value = '';
-            var notify_char = api.getCharacteristic(SERVICE_UUID, BUS_VOLT_UUID);
-            if (notify_char) {
-                notify_char.on('valueChange', function(notify_char) {
-                    api.busVoltage = api.calcApiReading(notify_char.value) * 0.01;
-                    api.busVoltage = api.busVoltage.toFixed(2);
-                    api.updateUI();
-                }, value);
-                notify_char.enableNotifications(function(notify_char, value) {
-                    console.log('Enabled the notification ', value);
-                }, true);
-            }
-        };
-
-        enableNotifyShuntChar() {
-            var value = '';
-            var notify_char = api.getCharacteristic(SERVICE_UUID, SHUNT_VOLT_UUID);
-            if (notify_char) {
-                notify_char.on('valueChange', function(notify_char) {
-                    api.shuntVoltage = api.calcApiReading(notify_char.value) * 0.01;
-                    api.shuntVoltage = api.shuntVoltage.toFixed(2);
-                    api.updateUI();
-                }, value);
-                notify_char.enableNotifications(function(notify_char, value) {
-                    console.log('Enabled the notification ', value);
-                }, true);
-            }
-        };
-
-        calcApiReading(value) {
-            var dataR = value;
-            if (dataR) {
-                var reading = '' + dataR[0] + dataR[1] + dataR[2] + dataR[3];
-                var readingValue = parseInt(reading, 16);
-                return readingValue;
-            }
-        }
+    function BluCurrent(bluetooth) {
+        this.connected = false;
+        this.relayCharacteristic = undefined;
+        this.relayStatus = undefined;
+        this.bluetooth = bluetooth;
     }
 
-    window.api = new API();
-})();
+    BluCurrent.prototype.connect = function connect() {
+
+        var self = this;
+
+        var options = {filters: [{services: [SERVICE_UUID]}]};
+
+        return this.bluetooth.requestDevice(options)
+            .then(function (device) {
+                return device.gatt.connect();
+            })
+            .then(function (server) {
+                return server.getPrimaryService(SERVICE_UUID)
+            })
+            .then(function (service) {
+                return Promise.all([
+                    service.getCharacteristic(RELAY_UUID)
+                        .then(function (characteristic) {
+                            self.relayCharacteristic = characteristic;
+                            return self.relayCharacteristic.readValue()
+                                .then(function (value) {
+                                    if (value.getUint8(0) === 0) { //ON
+                                        self.relayStatus = true;
+                                    } else { //OFF
+                                        self.relayStatus = false;
+                                    }
+                                });
+                        }),
+                    service.getCharacteristic(CURRENT_UUID)
+                        .then(function (characteristic) {
+                            return characteristic.startNotifications()
+                                .then(function () {
+                                    characteristic.addEventListener('characteristicvaluechanged', function (event) {
+                                        //todo: generate event
+                                        if (self.updateUI) {
+                                            self.updateUI(event.target.value, 'current');
+                                        }
+                                    });
+                                });
+                        }),
+                    service.getCharacteristic(SHUNT_VOLT_UUID)
+                        .then(function (characteristic) {
+                            return characteristic.startNotifications()
+                                .then(function () {
+                                    characteristic.addEventListener('characteristicvaluechanged', function (event) {
+                                        //todo: generate event
+                                        if (self.updateUI) {
+                                            self.updateUI(event.target.value, 'shunt');
+                                        }
+                                    });
+                                });
+                        }),
+                    service.getCharacteristic(BUS_VOLT_UUID)
+                        .then(function (characteristic) {
+                            return characteristic.startNotifications()
+                                .then(function () {
+                                    characteristic.addEventListener('characteristicvaluechanged', function (event) {
+                                        //todo: generate event
+                                        if (self.updateUI) {
+                                            self.updateUI(event.target.value, 'bus');
+                                        }
+                                    });
+                                });
+                        })
+                ]);
+            })
+            .then(function () {
+                self.connected = true;
+            });
+    }
+
+    BluCurrent.prototype.writeData = function writeData(sendData) {
+        if (this.relayCharacteristic) {
+            return this.relayCharacteristic.writeValue(sendData);
+        }
+
+        return Promise.reject();
+    }
+
+    return BluCurrent;
+
+}();
+
+if (window === undefined) {
+    module.exports.BluCurrent = BluCurrent;
+}
