@@ -4,7 +4,7 @@ var app;
         .config(function ($mdThemingProvider) {
             $mdThemingProvider.theme('default')
                 .primaryPalette('blue')
-                .accentPalette('blue-grey');
+                .accentPalette('indigo');
             $mdThemingProvider.theme('success-toast');
             $mdThemingProvider.theme('error-toast');
 
@@ -12,13 +12,33 @@ var app;
         })
 })();
 
+var match,
+    pl = /\+/g, // Regex for replacing addition symbol with a space
+    search = /([^&=]+)=?([^&]*)/g,
+    decode = function (s) {
+        return decodeURIComponent(s.replace(pl, " "));
+    },
+    query = window.location.search.substring(1);
+
+var urlParams = {};
+while (match = search.exec(query))
+    urlParams[decode(match[1])] = decode(match[2]);
+
+var cordovaApp = urlParams['app'];
+
 app.service('bluCurrentService', function () {
-    return new BluCurrent(navigator.bluetooth);
+    return new BluCurrent();
 });
 
 app.controller('mainController', function ($scope, $mdToast, $mdDialog, bluCurrentService) {
 
     $scope.blucurrent = bluCurrentService;
+
+    $scope.isApp = false;
+
+    if (cordovaApp == 'true') {
+        $scope.isApp = true;
+    }
 
     function goodToast(message) {
         $mdToast.show(
@@ -130,10 +150,20 @@ app.controller('mainController', function ($scope, $mdToast, $mdDialog, bluCurre
             });
     }
 
-    if (!navigator.bluetooth) {
-        badToast('Bluetooth not supported, which is required.');
-    } else if (navigator.bluetooth.referringDevice) {
-        $scope.onConnect();
+    $scope.onDisconnect = function () {
+        $scope.blucurrent.disconnect().then(function () {
+            console.log('Device disconnected successfully');
+            $scope.$apply();
+        });
     }
+
+    //Hack : waiting to load the plugin
+    setTimeout(function () {
+        if (!navigator.bluetooth) {
+            badToast('Bluetooth not supported, which is required.');
+        } else if (navigator.bluetooth.referringDevice) {
+            $scope.onConnect();
+        }
+    }, 2000);
 
 });

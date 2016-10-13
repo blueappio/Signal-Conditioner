@@ -9,11 +9,11 @@ var BluCurrent = function () {
     var CURRENT_UUID = 0x1239;
     var RELAY_UUID = 0x123B;
 
-    function BluCurrent(bluetooth) {
+    function BluCurrent() {
         this.connected = false;
         this.relayCharacteristic = undefined;
         this.relayStatus = undefined;
-        this.bluetooth = bluetooth;
+        this.bluetoothDevice = undefined;
     }
 
     BluCurrent.prototype.connect = function connect() {
@@ -22,8 +22,9 @@ var BluCurrent = function () {
 
         var options = {filters: [{services: [SERVICE_UUID]}]};
 
-        return this.bluetooth.requestDevice(options)
+        return navigator.bluetooth.requestDevice(options)
             .then(function (device) {
+                self.bluetoothDevice = device;
                 return device.gatt.connect();
             })
             .then(function (server) {
@@ -92,6 +93,23 @@ var BluCurrent = function () {
         }
 
         return Promise.reject();
+    }
+
+    BluCurrent.prototype.disconnect = function disconnect() {
+        var self = this;
+        if (!self.bluetoothDevice) {
+            return Promise.reject();
+        }
+        return self.bluetoothDevice.disconnect()
+            .then(function () {
+                self.connected = false;
+                self.relayCharacteristic = undefined;
+                self.relayStatus = undefined;
+                self.bluetoothDevice = undefined;
+
+                return Promise.resolve();
+            });
+
     }
 
     return BluCurrent;
