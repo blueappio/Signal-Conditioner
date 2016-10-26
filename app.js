@@ -96,20 +96,6 @@ app.controller('mainController', function ($scope, $mdToast, $mdDialog, bluCurre
         $mdDialog.cancel();
     };
 
-    function connectCall(){
-        $scope.terminal.connect()
-            .then(function () {
-                dismissLoadingIndicator();
-                goodToast('Connected...');
-                $scope.$apply();
-            })
-            .catch(function (error) {
-                dismissLoadingIndicator();
-                console.error('Argh!', error, error.stack ? error.stack : '');
-                badToast('Unable to connect.');
-            });
-    }
-
     $scope.toggleRelay = function () {
         var bytes = [];
         if ($scope.isOn) {
@@ -152,14 +138,16 @@ app.controller('mainController', function ($scope, $mdToast, $mdDialog, bluCurre
 
     $scope.onConnect = function () {
         showLoadingIndicator('', 'Connecting ....');
-        if($scope.isApp){
-            setTimeout(function () {
-                connectCall();
-            }, 1500);
-        }
-        else{
-            connectCall();
-        }
+        $scope.blucurrent.connect()
+            .then(function () {
+                dismissLoadingIndicator();
+                goodToast('Connected...');
+            })
+            .catch(function (error) {
+                dismissLoadingIndicator();
+                console.error('Argh!', error, error.stack ? error.stack : '');
+                badToast('Unable to connect.');
+            });
     }
 
     $scope.onDisconnect = function () {
