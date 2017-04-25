@@ -23,7 +23,7 @@
 <script src="app.js"></script>
 
 <body ng-app="blucurrent" class="thing">
-    <div ng-controller="mainController as main" md-theme-watch="true">
+    <div ng-controller="mainController as main" md-theme-watch="true" ng-cloak>
         <div id='scanDialog'></div>
         <div class="row heading" flex="100" layout="row">
             <div class="logo" style="margin-top: 6px;"></div>
@@ -42,7 +42,7 @@
             <div class="light-blue-fg font-size-72 line-height-72 padding-top-9 ng-binding">
                 {{currentValue}} <sub style="font-size: 30px;"> mA </sub>
             </div>
-            <div class="h3 secondary-text font-weight-500 padding-top-9 ng-binding">
+            <!-- <div class="h3 secondary-text font-weight-500 padding-top-9 ng-binding">
                 <md-list>
                     <md-list-item>
                         <p> Relay : </p>&nbsp
@@ -50,7 +50,7 @@
                         </md-switch>
                     </md-list-item>
                 </md-list>
-            </div>
+            </div> -->
         </div>
         <div class="layout-wrap layout-row flex-100" layout="row" flex="100" layout-wrap="">
             <div layout="column" flex="100" flex-gt-sm="50" class="layout-column flex-gt-sm-50 flex-100">
