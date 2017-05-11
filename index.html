@@ -1,72 +1,16 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"><meta content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1,minimal-ui" name="viewport"><meta content="AkK15PCT/JQzZOG2MuAyNPO4fR1U0rtIhLAogFay1cDTMLL2ulyBPKWiTiGdPa5FIzAHDC2yC+7mF/YBe+tI0g8AAABaeyJvcmlnaW4iOiAiaHR0cHM6Ly92ZW5zaS5naXRodWIuaW86NDQzIiwgImZlYXR1cmUiOiAiV2ViQmx1ZXRvb3RoIiwgImV4cGlyeSI6IDE0NzMyNjQ4NDV9" http-equiv="origin-trial"><title>BluCurrent</title><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><script src="cordova.js"></script><link href="styles/vendor-4ecc8092b1.css" rel="stylesheet"><link href="styles/app-988ec60e21.css" rel="stylesheet"><script src="scripts/vendor-d4c228189f.js"></script><script src="scripts/app-bf91951fe4.js"></script></head><body class="thing"><div md-theme-watch="true" ng-cloak ng-controller="mainController as main"><div id="scanDialog"></div><div class="heading row" layout="row" flex="100"><div class="dialog-demo-content" style="position: absolute; left: 0px; width: 62px" ng-show="blucurrent.connected"><md-button ng-click="showSettingsDialog($event);" aria-label="Settings" class="md-icon-button md-primary"><md-icon md-svg-icon="app/images/settings.svg" style="color: #3e3737"></md-icon></md-button></div><div class="logo" style="margin-top: 6px"></div><div layout="column" flex="20" layout-align="center end" style="position: absolute; right: 0px; width: 62px; margin-top: -3px" ng-hide="blucurrent.connected"><md-button ng-click="onConnect()" style="text-transform: capitalize !important; color: white">Connect</md-button></div><div layout="column" flex="20" layout-align="center end" style="position: absolute; right: 0px; width: 62px; margin-top: -3px" ng-show="blucurrent.connected && isApp"><md-button ng-click="onDisconnect()" style="text-transform: capitalize !important; color: white">Disconnect</md-button></div></div><div class="layout-column layout-align-center-center ng-scope" layout="column" layout-align="center center" ng-hide="!blucurrent.connected"><div class="ng-binding light-blue-fg" style="font-size: 62px;color: #03A9F4!important;padding-top: 9px;padding-left: 25px">{{currentValue}} <sub style="font-size: 30px">{{currentUnits}}</sub></div><div class="ng-binding font-weight-500 h3 padding-top-9 secondary-text" ng-if="blucurrent.hasRelayCharacteristic"><md-list><md-list-item><p>Relay :</p>&nbsp<md-switch aria-label="Switch 1" ng-change="toggleRelay()" ng-model="isOn" style="padding-top: 3px"></md-switch></md-list-item></md-list></div></div><div class="flex-100 layout-row layout-wrap" layout="row" flex="100" ng-if="blucurrent.connected" layout-wrap=""><div class="flex-100 flex-gt-sm-50 layout-column" layout="column" flex="100" ng-if="shuntVoltage" flex-gt-sm="50"><md-list flex><md-list-item><p style="padding-left: 10px">Shunt Voltage :</p><p class="reading-display">{{shuntVoltage}}</p></md-list-item></md-list></div><div class="flex-100 flex-gt-sm-50 layout-column" layout="column" flex="100" ng-if="busVoltage" flex-gt-sm="50"><md-list flex><md-list-item><p style="padding-left: 10px">BUS Voltage :</p><p class="reading-display">{{busVoltage}}</p></md-list-item></md-list></div></div></div></body><script type="text/javascript">angular.bootstrap(document, ['blucurrent']);
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Origin Trial Token -->
-    <meta http-equiv="origin-trial"
-          content="AtgOYVRO5xlsm/3qCzZ701Hx8qTUrCUbFVML9Z8E9vELP5w9K9E73YWGBQc4Ivy0hGd+++sh7JUtKx+3EuV3ngkAAABeeyJvcmlnaW4iOiAiaHR0cHM6Ly9ibHVlYXBwaW8uZ2l0aHViLmlvOjQ0MyIsICJmZWF0dXJlIjogIldlYkJsdWV0b290aCIsICJleHBpcnkiOiAxNDc2ODE1NjAyfQ=="/>
-    <title>BluCrrent</title>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc4/angular-material.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc4/angular-material.min.js"></script>
-
-<script src="https://blueappio.github.io/blueapp.io/blueapp.io.min.js"></script>
-<script src="cordova/cordova-init.js"></script>
-<script src="blucurrent.js"></script>
-<script src="app.js"></script>
-
-<body ng-app="blucurrent" class="thing">
-    <div ng-controller="mainController as main" md-theme-watch="true" ng-cloak>
-        <div id='scanDialog'></div>
-        <div class="row heading" flex="100" layout="row">
-            <div class="logo" style="margin-top: 6px;"></div>
-            <div layout="column" flex="20" layout-align="center end" style="position: absolute; right: 0px; width: 62px; margin-top: -3px;" ng-hide="blucurrent.connected">
-                <md-button style="text-transform: capitalize !important; color: white;" ng-click="onConnect()">
-                    Connect
-                </md-button>
-            </div>
-            <div layout="column" flex="20" layout-align="center end" style="position: absolute; right: 0px; width: 62px; margin-top: -3px;" ng-show="blucurrent.connected && isApp">
-                <md-button style="text-transform: capitalize !important; color: white;" ng-click="onDisconnect()">
-                    Disconnect
-                </md-button>
-            </div>
-        </div>
-        <div class="pt-8 pb-32 ng-scope layout-align-center-center layout-column" layout="column" layout-align="center center" ng-show="blucurrent.connected">
-            <div class="light-blue-fg font-size-72 line-height-72 padding-top-9 ng-binding">
-                {{currentValue}} <sub style="font-size: 30px;"> mA </sub>
-            </div>
-            <div class="h3 secondary-text font-weight-500 padding-top-9 ng-binding" ng-if = "blucurrent.hasRelayCharacteristic">
-                <md-list>
-                    <md-list-item>
-                        <p> Relay : </p>&nbsp
-                        <md-switch ng-model="isOn" aria-label="Switch 1" ng-change="toggleRelay()" style="padding-top: 3px;">
-                        </md-switch>
-                    </md-list-item>
-                </md-list>
-            </div>
-        </div>
-        <div class="layout-wrap layout-row flex-100" layout="row" flex="100" layout-wrap="">
-            <div layout="column" flex="100" flex-gt-sm="50" class="layout-column flex-gt-sm-50 flex-100">
-                <md-list-item>
-                    <p style="padding-left: 10px;"> Shunt Voltage : </p>
-                    <p class="reading-display">{{shuntVoltage}}</p>
-                </md-list-item>
-            </div>
-            <div layout="column" flex="100" flex-gt-sm="50" class="layout-column flex-gt-sm-50 flex-100">
-                <md-list-item>
-                    <p style="padding-left: 10px;">BUS Voltage :</p>
-                    <p class="reading-display">{{busVoltage}}</p>
-                </md-list-item>
-            </div>
-        </div>
-    </div>
-</body>
-
-</html>
+function onDeviceReady() {
+    if (navigator.splashscreen) navigator.splashscreen.hide();
+    document.addEventListener("backbutton", function(e) {
+        e.preventDefault();
+        if (confirm("Are you sure you want to exit from the app?")) {
+            navigator.app.exitApp()
+        }
+    }, false);
+}
+if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/)) {
+    document.addEventListener("deviceready", onDeviceReady, false);
+} else {
+    onDeviceReady();
+}</script></html>
